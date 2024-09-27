@@ -10,7 +10,7 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5002/predict', {
+      const response = await fetch('https://fakenewsapi-jqok.onrender.com/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
