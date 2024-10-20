@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded">
-        <h1 className="text-2xl font-semibold text-center mb-6">Fake Health News Detection</h1>
+        <h1 className="text-2xl font-semibold text-center mb-6">Fake News Detection</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             className="w-full p-2 border border-gray-300 rounded"
