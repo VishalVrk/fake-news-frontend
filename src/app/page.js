@@ -1,5 +1,5 @@
-"use client";
-import { useState } from "react";
+"use client"
+import { useState } from 'react';
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -10,15 +10,15 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('/api/gradio-predict', {
+      const response = await fetch('https://fakenewsapi-jqok.onrender.com/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: text }), // Send the user's input as 'query'
+        body: JSON.stringify({ text }),
       });
       const data = await response.json();
-      setPrediction(data); // Set the entire response as the prediction
+      setPrediction(data.prediction);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -47,8 +47,7 @@ export default function Home() {
         {prediction && (
           <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
             <p className="text-lg font-medium">Prediction:</p>
-            <p>{prediction.Prediction || "No prediction available"}</p>
-            <p className="mt-2"><strong>Justification:</strong> {prediction.Justification || "No justification available"}</p>
+            <p>{prediction}</p>
           </div>
         )}
       </div>
