@@ -30,11 +30,15 @@ export default function Home() {
       if (data && data.prediction && data.prediction[1]) {
         const predictionArray = data.prediction[1]; // Extract nested array
 
-        // Extract the text fields from the prediction response
-        const userInput = predictionArray[0][0].text; // e.g., "Chennai is in India"
-        const predictionText = predictionArray[0][1].text; // e.g., Prediction and justification
+        // Split the prediction text into Prediction and Justification
+        const fullText = predictionArray[0][1].text; // e.g., Prediction and justification text
+        const [predictionText, justificationText] = fullText.split('Justification:');
 
-        setPrediction({ userInput, predictionText }); // Set the extracted prediction and text
+        // Set the extracted prediction and justification in the state
+        setPrediction({
+          predictionText: predictionText.trim(), // Clean and trim the prediction part
+          justificationText: justificationText.trim(), // Clean and trim the justification part
+        });
       } else {
         throw new Error('Invalid response format');
       }
@@ -77,10 +81,11 @@ export default function Home() {
         {/* Display prediction if available */}
         {prediction && (
           <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
-            <p className="text-lg font-medium">Input:</p>
-            <p>{prediction.userInput}</p> {/* Display user input */}
-            <p className="mt-2 text-lg font-medium">Prediction:</p>
-            <p>{prediction.predictionText}</p> {/* Display prediction and justification */}
+            <p className="text-lg font-medium">Prediction:</p>
+            <p>{prediction.predictionText}</p> {/* Display prediction */}
+
+            <p className="mt-2 text-lg font-medium">Justification:</p>
+            <p>{prediction.justificationText}</p> {/* Display justification */}
           </div>
         )}
       </div>
