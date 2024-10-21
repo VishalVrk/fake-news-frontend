@@ -6,20 +6,20 @@ export default function Home() {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Function to call the Next.js API route
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('/api/gradio-predict', {  // Call the API route
+      const response = await fetch('/api/gradio-predict', {  // Call the Next.js API route
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: text }),  // Send the user's query to the API
+        body: JSON.stringify({ query: text }),  // Send the query to the API
       });
       const data = await response.json();
-      setPrediction(data);  // Update prediction result
+      console.log("Frontend API Response:", data);  // Log the response to inspect it
+      setPrediction(data);  // Set the prediction result from the API
     } catch (error) {
       console.error('Error:', error);
     }
@@ -48,8 +48,8 @@ export default function Home() {
         {prediction && (
           <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
             <p className="text-lg font-medium">Prediction:</p>
-            <p>{prediction.Prediction}</p>
-            <p className="mt-2"><strong>Justification:</strong> {prediction.Justification}</p>
+            <p>{prediction.Prediction || "No prediction available"}</p>
+            <p className="mt-2"><strong>Justification:</strong> {prediction.Justification || "No justification available"}</p>
           </div>
         )}
       </div>
