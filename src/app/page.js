@@ -1,5 +1,5 @@
-"use client"
-import { useState } from 'react';
+"use client";
+import { useState } from "react";
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -10,16 +10,15 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('/api/gradio-predict', {  // Call the Next.js API route
+      const response = await fetch('/api/gradio-predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: text }),  // Send the query to the API
+        body: JSON.stringify({ query: text }), // Send the user's input as 'query'
       });
       const data = await response.json();
-      console.log("Frontend API Response:", data);  // Log the response to inspect it
-      setPrediction(data);  // Set the prediction result from the API
+      setPrediction(data); // Set the entire response as the prediction
     } catch (error) {
       console.error('Error:', error);
     }
