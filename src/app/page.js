@@ -1,33 +1,25 @@
 "use client"
 import { useState } from 'react';
-import { Client } from "@gradio/client";  // Import the Gradio client
 
 export default function Home() {
   const [text, setText] = useState('');
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Function to connect and predict using the Hugging Face Gradio API
+  // Function to call the Next.js API route
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Connect to the Hugging Face model
-      const client = await Client.connect("Qwen/Qwen2.5");  // Model name provided in the API code
-      
-      // Send the query and system prompt to the model
-      const result = await client.predict("/model_chat_1", {
-        query: text,  // The input from the user (query)
-        history: [],  // History is kept empty
-        system: `Given an input (whether it's a link or a question), verify its accuracy using available online resources. Determine if the information is true or false. Provide the output in the following format:
-
-        Prediction: A one-line statement confirming if the information is true or false with a percentage of certainty.
-        Justification: A brief paragraph (under 1000 characters) explaining the reasoning behind the prediction.`,
-        radio: "72B",  // Example radio value, ensure it's a valid input
+      const response = await fetch('/api/gradio-predict', {  // Call the API route
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: text }),  // Send the user's query to the API
       });
-      
-      // Set the prediction result (use the format that matches the returned data)
-      setPrediction(result.data);
+      const data = await response.json();
+      setPrediction(data);  // Update prediction result
     } catch (error) {
       console.error('Error:', error);
     }
