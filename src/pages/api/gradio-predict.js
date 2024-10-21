@@ -1,4 +1,6 @@
 import { Client } from "@gradio/client";
+import fetch from 'node-fetch';
+
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
