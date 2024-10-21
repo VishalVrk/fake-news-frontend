@@ -26,9 +26,15 @@ export default function Home() {
       // Log the response to see if it contains valid data
       console.log("API response:", data);
 
-      // Check if the prediction field exists in the response
-      if (data && data.prediction) {
-        setPrediction(data.prediction);  // Update state with prediction
+      // Check if the prediction field exists in the response and process it
+      if (data && data.prediction && data.prediction[1]) {
+        const predictionArray = data.prediction[1]; // Extract nested array
+
+        // Extract the text fields from the prediction response
+        const userInput = predictionArray[0][0].text; // e.g., "Chennai is in India"
+        const predictionText = predictionArray[0][1].text; // e.g., Prediction and justification
+
+        setPrediction({ userInput, predictionText }); // Set the extracted prediction and text
       } else {
         throw new Error('Invalid response format');
       }
@@ -71,8 +77,10 @@ export default function Home() {
         {/* Display prediction if available */}
         {prediction && (
           <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
-            <p className="text-lg font-medium">Prediction:</p>
-            <pre>{JSON.stringify(prediction, null, 2)}</pre> {/* Display prediction as JSON for debugging */}
+            <p className="text-lg font-medium">Input:</p>
+            <p>{prediction.userInput}</p> {/* Display user input */}
+            <p className="mt-2 text-lg font-medium">Prediction:</p>
+            <p>{prediction.predictionText}</p> {/* Display prediction and justification */}
           </div>
         )}
       </div>
