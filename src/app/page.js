@@ -5,12 +5,12 @@ export default function Home() {
   const [text, setText] = useState('');
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);  // Add error state to capture issues
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);  // Reset any previous errors
+    setError(null);
 
     try {
       const response = await fetch('https://fakenewsapi-jqok.onrender.com/predict', {
@@ -18,20 +18,23 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),  // Send user input in request body
+        body: JSON.stringify({ text }), // Send the user's input as 'text'
       });
 
       const data = await response.json();
 
-      // Check if the response contains an error
-      if (!response.ok || !data.prediction) {
-        throw new Error('Failed to get prediction or invalid response');
-      }
+      // Log the response to see if it contains valid data
+      console.log("API response:", data);
 
-      setPrediction(data.prediction);  // Set the prediction result
+      // Check if the prediction field exists in the response
+      if (data && data.prediction) {
+        setPrediction(data.prediction);  // Update state with prediction
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       console.error('Error:', error);
-      setError('Failed to fetch prediction. Please try again.');  // Set error message
+      setError('Failed to fetch prediction. Please try again.');
     }
 
     setLoading(false);
@@ -58,18 +61,18 @@ export default function Home() {
           </button>
         </form>
 
-        {/* Display the error message if any */}
+        {/* Display error if any */}
         {error && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded">
             <p className="text-lg font-medium text-red-500">Error: {error}</p>
           </div>
         )}
 
-        {/* Display the prediction result if available */}
+        {/* Display prediction if available */}
         {prediction && (
           <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
             <p className="text-lg font-medium">Prediction:</p>
-            <p>{prediction}</p>
+            <pre>{JSON.stringify(prediction, null, 2)}</pre> {/* Display prediction as JSON for debugging */}
           </div>
         )}
       </div>
