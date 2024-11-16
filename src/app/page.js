@@ -16,7 +16,7 @@ export default function Home() {
     }
 
     try {
-      const response = await fetch("http://localhost:5002/suggest", {
+      const response = await fetch("https://fakenewsapi-jqok.onrender.com/suggest", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5002/predict", {
+      const response = await fetch("https://fakenewsapi-jqok.onrender.com/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
