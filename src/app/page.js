@@ -58,6 +58,7 @@ export default function Home() {
   };
 
   // Handle prediction submission
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -75,7 +76,12 @@ export default function Home() {
       const data = await response.json();
   
       if (response.ok && data.content) {
-        setPrediction({ predictionText: data.content, justificationText: "No justification provided" });
+        // Extract prediction and justification by splitting content
+        const contentLines = data.content.split("\n");
+        const predictionText = contentLines[0].replace("Prediction: ", "").trim();
+        const justificationText = contentLines.slice(1).join(" ").replace("Justification: ", "").trim();
+  
+        setPrediction({ predictionText, justificationText });
       } else {
         throw new Error(data.error || "Invalid response format");
       }
@@ -86,6 +92,8 @@ export default function Home() {
   
     setLoading(false);
   };  
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4">
