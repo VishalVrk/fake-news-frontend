@@ -1,15 +1,13 @@
 "use client";
 import { useState } from "react";
-import { Search, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { Search, X, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 
 export default function Home() {
-  const [text, setText] = useState(""); // For the input text
-  const [suggestions, setSuggestions] = useState([]); // For the suggestions
-  const [prediction, setPrediction] = useState(null); // For the prediction result
-  const [loading, setLoading] = useState(false); // For the loading state
-  const [error, setError] = useState(null); // For errors
-  const [apiKey, setApiKey] = useState(""); // For OpenAI API Key
-  const [apiKeySubmitted, setApiKeySubmitted] = useState(false); // For API Key submission
+  const [text, setText] = useState(""); // Input text
+  const [suggestions, setSuggestions] = useState([]); // Suggestions list
+  const [prediction, setPrediction] = useState(null); // Prediction result
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   // Fetch suggestions from the server
   const fetchSuggestions = async (query) => {
@@ -45,46 +43,18 @@ export default function Home() {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setText(value);
-    fetchSuggestions(value); // Trigger suggestions fetch
+    fetchSuggestions(value); // Fetch suggestions dynamically
   };
 
   // Handle suggestion selection
   const handleSuggestionClick = (suggestion) => {
-    setText(suggestion); // Set the input to the clicked suggestion
-    setSuggestions([]); // Clear suggestions
+    setText(suggestion);
+    setSuggestions([]); // Clear suggestions after selection
   };
 
-  // Handle API Key submission
-  const handleApiKeySubmit = async (e) => {
-    e.preventDefault();
-
-    if (!apiKey.trim()) {
-      alert("Please enter a valid API key.");
-      return;
-    }
-
-    try {
-      const response = await fetch("https://fakenewsapi-jqok.onrender.com/update-api-key", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ apiKey }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(data.message); // Notify user
-        setApiKeySubmitted(true); // Mark API Key as submitted
-      } else {
-        console.error("Error updating API key:", data.error || "Unknown error");
-        alert("Error updating API key. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error updating API key:", error);
-      alert("Error updating API key. Please try again.");
-    }
+  // Clear suggestions manually
+  const clearSuggestions = () => {
+    setSuggestions([]);
   };
 
   // Handle prediction submission
@@ -92,26 +62,20 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     try {
       const response = await fetch("https://fakenewsapi-jqok.onrender.com/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text}), // Include the API Key in the payload
+        body: JSON.stringify({ text }),
       });
-
+  
       const data = await response.json();
-
-      if (response.ok && data.prediction) {
-        const predictionArray = data.prediction[1];
-        const fullText = predictionArray[0][1].text;
-        const [predictionText, justificationText] = fullText.split("Justification:");
-        setPrediction({
-          predictionText: predictionText.trim(),
-          justificationText: justificationText.trim(),
-        });
+  
+      if (response.ok && data.content) {
+        setPrediction({ predictionText: data.content, justificationText: "No justification provided" });
       } else {
         throw new Error(data.error || "Invalid response format");
       }
@@ -119,9 +83,9 @@ export default function Home() {
       console.error("Error:", error);
       setError("Failed to fetch prediction. Please try again.");
     }
-
+  
     setLoading(false);
-  };
+  };  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4">
@@ -136,32 +100,9 @@ export default function Home() {
 
           {/* Content */}
           <div className="p-6 space-y-6">
-            {/* API Key Input */}
-            {!apiKeySubmitted && (
-              <form onSubmit={handleApiKeySubmit} className="space-y-4 mb-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">API Key</label>
-                  <input
-                    type="text"
-                    className="w-full pl-3 pr-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-shadow"
-                    placeholder="Enter your OpenAI API key..."
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
-                >
-                  Submit API Key
-                </button>
-              </form>
-            )}
-
             {/* Main Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                     <Search className="h-5 w-5 text-gray-400" />
@@ -174,7 +115,17 @@ export default function Home() {
                     onChange={handleInputChange}
                     required
                   />
+                  {suggestions.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearSuggestions}
+                      className="absolute right-3 inset-y-0 flex items-center text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
                 </div>
+
                 {suggestions.length > 0 && (
                   <ul className="absolute w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                     {suggestions.map((suggestion, index) => (
